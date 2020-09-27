@@ -1,0 +1,43 @@
+{
+  "name": "nodejs-background-worker",
+  "description": "NodeJS service that offloads expensive jobs to Bull for background processing.",
+  "author": "Anthony Hastings <ar.hastings@gmail.com> (https://anthonyhastings.github.io/)",
+  "main": "src/service.mjs",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "bull": "3.18.0",
+    "bull-board": "0.9.0",
+    "express": "4.17.1",
+    "express-winston": "4.0.5",
+    "faker": "5.1.0",
+    "nodemon": "2.0.4",
+    "winston": "3.3.3"
+  },
+  "devDependencies": {
+    "eslint": "7.9.0",
+    "eslint-config-airbnb-base": "14.2.0",
+    "eslint-config-prettier": "6.12.0",
+    "eslint-plugin-import": "2.22.0",
+    "eslint-plugin-prettier": "3.1.4",
+    "husky": "4.3.0",
+    "lint-staged": "10.4.0",
+    "prettier": "2.1.2"
+  },
+  "scripts": {
+    "eslint-check": "eslint --print-config src/service.mjs | eslint-config-prettier-check",
+    "lint": "eslint --ext js --ext mjs --max-warnings 0 src/",
+    "start": "nodemon src/service.mjs",
+    "start-worker": "nodemon src/worker.mjs"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,mjs}": "eslint --max-warnings 0"
+  }
+}

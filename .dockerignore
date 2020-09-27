@@ -1,0 +1,9 @@
+# Ignore all files by default.
+*
+
+# White list only the required files and folders.
+!src/
+!.eslintrc.json
+!.prettierrc.json
+!package.json
+!yarn.lock
