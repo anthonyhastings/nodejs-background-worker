@@ -8,36 +8,34 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "bull": "3.18.0",
-    "bull-board": "0.9.0",
-    "express": "4.17.1",
-    "express-winston": "4.0.5",
-    "faker": "5.1.0",
-    "nodemon": "2.0.4",
-    "winston": "3.3.3"
+    "@bull-board/api": "^4.6.3",
+    "@bull-board/express": "^4.6.3",
+    "@faker-js/faker": "^7.6.0",
+    "bull": "^4.10.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-winston": "^4.2.0",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "7.9.0",
-    "eslint-config-airbnb-base": "14.2.0",
-    "eslint-config-prettier": "6.12.0",
-    "eslint-plugin-import": "2.22.0",
-    "eslint-plugin-prettier": "3.1.4",
-    "husky": "4.3.0",
-    "lint-staged": "10.4.0",
-    "prettier": "2.1.2"
+    "eslint": "^8.27.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1"
   },
   "scripts": {
-    "eslint-check": "eslint --print-config src/service.mjs | eslint-config-prettier-check",
-    "lint": "eslint --ext js --ext mjs --max-warnings 0 src/",
-    "start": "nodemon src/service.mjs",
-    "start-worker": "nodemon src/worker.mjs"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "eslint:base": "eslint --ext .mjs --max-warnings 0",
+    "eslint:check": "eslint-config-prettier src/service.mjs",
+    "lint:format": "prettier --check .",
+    "lint:scripts": "time yarn run eslint:base src/",
+    "prepare": "husky install",
+    "start:service": "node --watch src/service.mjs",
+    "start:worker": "node --watch src/worker.mjs"
   },
   "lint-staged": {
-    "*.{js,mjs}": "eslint --max-warnings 0"
+    "*.{mjs}": "yarn run eslint:base"
   }
 }

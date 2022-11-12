@@ -1,18 +1,14 @@
+import * as dotenv from 'dotenv';
 import express from 'express';
 import expressWinston from 'express-winston';
 import Queue from 'bull';
-import bullBoard from 'bull-board';
-import faker from 'faker';
+import { createBullBoard } from '@bull-board/api';
+import { BullAdapter } from '@bull-board/api/bullAdapter.js';
+import { ExpressAdapter } from '@bull-board/express';
+import { faker } from '@faker-js/faker';
 import logger from './logger.mjs';
 
-// Connect to an existing queue (if found), or, create a new queue in Redis.
-const emailVerificationQueue = new Queue(
-  'email-verification',
-  process.env.REDIS_URL
-);
-
-// Inform bull-board which queues it's UI should provide information on.
-bullBoard.setQueues([emailVerificationQueue]);
+dotenv.config();
 
 // Creating an Express application.
 const app = express();
@@ -27,8 +23,21 @@ app.use(
   })
 );
 
-// Attaching bull-board middleware to a top-level route.
-app.use('/queues', bullBoard.UI);
+// Connect to an existing queue (if found), or, create a new queue in Redis.
+const emailVerificationQueue = new Queue(
+  'email-verification',
+  process.env.REDIS_URL
+);
+
+// Create express application for bull-board that subscribes to specific queues
+// then attach the application to a top-level route.
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/queues');
+app.use('/queues', serverAdapter.getRouter());
+createBullBoard({
+  queues: [new BullAdapter(emailVerificationQueue)],
+  serverAdapter,
+});
 
 // Adding a POST endpoint to make a place a dummy job into the Bull queue.
 // The job has exponential backoff should it fail, and can be retried twenty times.
@@ -36,10 +45,11 @@ app.post('/job', async (request, response) => {
   const firstName = faker.name.firstName();
   const lastName = faker.name.lastName();
   const email = faker.internet.email(firstName, lastName);
+
   const job = await emailVerificationQueue.add(
     { firstName, lastName, email },
     {
-      attempts: 20,
+      attempts: 10,
       backoff: {
         type: 'exponential',
         delay: 1000,

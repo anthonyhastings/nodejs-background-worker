@@ -1,4 +1,5 @@
-FROM node:14.11.0-alpine
+FROM node:18.12.1-alpine
+
 LABEL maintainer="Anthony Hastings <ar.hastings@gmail.com>"
 
 ENV DOCKERIZE_VERSION v0.6.1
@@ -8,11 +9,13 @@ RUN apk add --no-cache openssl \
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-WORKDIR /nodejs-background-worker
+USER node
+
+WORKDIR /home/node
 
 COPY package.json yarn.lock ./
 
-RUN yarn install && yarn cache clean
+RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY . ./
 

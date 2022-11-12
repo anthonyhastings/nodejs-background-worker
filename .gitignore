@@ -1,6 +1,5 @@
 node_modules/
 redis-data/
-.vscode/
 .env
 .DS_Store
 package-lock.json
