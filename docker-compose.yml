@@ -1,27 +1,28 @@
-version: '3.7'
-x-service-defaults:
-  &service-defaults
-    build:
-      context: ./
-    depends_on:
-      - redis
-    environment:
-      - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./src:/nodejs-background-worker/src
+version: '3.8'
+x-service-defaults: &service-defaults
+  build:
+    context: ./
+  depends_on:
+    - redis
+  environment:
+    - REDIS_URL=redis://redis:6379
+  volumes:
+    - ./src:/home/node/src
 services:
   service:
-    << : *service-defaults
-    command: sh -c "dockerize -wait tcp://redis:6379 yarn start"
+    <<: *service-defaults
+    command: sh -c "dockerize -wait tcp://redis:6379 yarn start:service"
     ports:
-      - 8080:5000
+      - target: 5000
+        published: 8080
   worker:
-    << : *service-defaults
-    command: sh -c "dockerize -wait tcp://redis:6379 yarn start-worker"
+    <<: *service-defaults
+    command: sh -c "dockerize -wait tcp://redis:6379 yarn start:worker"
   redis:
-    image: redis:6.0.8-alpine
+    image: redis:7.0.5-alpine
     command: redis-server --appendonly yes
     ports:
-      - 40001:6379
+      - target: 6379
+        published: 40001
     volumes:
       - ./redis-data:/data

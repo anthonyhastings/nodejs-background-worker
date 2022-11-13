@@ -1,7 +1,7 @@
 import winston from 'winston';
 
 // Creating a Winston logger instance that can be used by both
-// the Express application and the worker processor.
+// the service and the worker.
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(

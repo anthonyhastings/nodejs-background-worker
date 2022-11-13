@@ -1,20 +1,20 @@
 {
+  "extends": ["airbnb-base", "prettier"],
   "root": true,
   "env": {
-    "es6": true,
+    "es2022": true,
     "node": true
   },
   "parserOptions": {
-    "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "extends": [
-    "eslint:recommended",
-    "airbnb-base",
-    "plugin:prettier/recommended"
-  ],
   "rules": {
-    "import/extensions": "off",
-    "no-await-in-loop": "off"
+    "import/extensions": [
+      "error",
+      {
+        "js": "always",
+        "mjs": "always"
+      }
+    ]
   }
 }

@@ -1,8 +1,15 @@
+/* eslint-disable no-await-in-loop */
+import * as dotenv from 'dotenv';
 import Queue from 'bull';
 import logger from './logger.mjs';
 
+dotenv.config();
+
 // An artificial sleep method to simulate a wait.
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 // Connect to an existing queue (if found), or, create a new queue in Redis.
 const emailVerificationQueue = new Queue(
@@ -14,6 +21,7 @@ const emailVerificationQueue = new Queue(
 // so it returns a promise.
 emailVerificationQueue.process(async (job) => {
   logger.info(`Processing Job ID #${job.id}`, { data: job.data });
+  await job.log('Beginning processing...');
 
   // Making jobs fail 50% of the time. Failure is denoted by throwing an error
   // which rejects the processing functions promise.
@@ -28,12 +36,14 @@ emailVerificationQueue.process(async (job) => {
   while (progress < 100) {
     await sleep(80);
     progress += 1;
-    job.progress(progress);
+    await job.log('Making progress...');
+    await job.progress(progress);
   }
 
   // Success is denoted by resolving the processing functions promise. Data returned
   // while resolving is stored against the job and can be seen in redis or the
   // services GET `/jobs/:id` endpoint as `returnValue`.
+  await job.log('Success!');
   logger.info(`Successfully processed Job ID #${job.id}`);
   return { emailSent: true, sentAt: new Date().getTime() };
 });
