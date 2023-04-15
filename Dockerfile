@@ -1,4 +1,4 @@
-FROM node:18.12.1-alpine
+FROM node:18.16.0-alpine
 
 LABEL maintainer="Anthony Hastings <ar.hastings@gmail.com>"
 
@@ -19,4 +19,4 @@ RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY . ./
 
-CMD yarn start
+CMD yarn start:service
