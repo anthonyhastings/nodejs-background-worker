@@ -34,8 +34,5 @@
     "prepare": "husky install",
     "start:service": "node --watch src/service.mjs",
     "start:worker": "node --watch src/worker.mjs"
-  },
-  "lint-staged": {
-    "*.{mjs}": "yarn run eslint:base"
   }
 }
