@@ -5,7 +5,8 @@ x-service-defaults: &service-defaults
   depends_on:
     - redis
   environment:
-    - REDIS_URL=redis://redis:6379
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
   volumes:
     - ./src:/home/node/src
 services:
