@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import * as dotenv from 'dotenv';
 import { Worker } from 'bullmq';
-import logger from './logger.mjs';
+import { logger } from './logger.mjs';
 
 dotenv.config();
 
