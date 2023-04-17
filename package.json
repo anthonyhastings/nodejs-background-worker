@@ -32,6 +32,6 @@
     "lint": "time yarn run eslint:base src/",
     "prepare": "husky install",
     "start:service": "node --watch src/service.mjs",
-    "start:worker": "node --watch src/worker.mjs"
+    "start:standard-queue-worker": "node --watch src/worker-standard.mjs"
   }
 }

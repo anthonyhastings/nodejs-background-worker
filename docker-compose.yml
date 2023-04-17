@@ -16,9 +16,9 @@ services:
     ports:
       - target: 5000
         published: 8080
-  worker:
+  standard-queue-worker:
     <<: *service-defaults
-    command: sh -c "dockerize -wait tcp://redis:6379 yarn start:worker"
+    command: sh -c "dockerize -wait tcp://redis:6379 yarn start:standard-queue-worker"
   redis:
     image: redis:7.0.5-alpine
     command: redis-server --appendonly yes

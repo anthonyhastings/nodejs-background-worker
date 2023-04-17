@@ -24,7 +24,7 @@ app.use(
 );
 
 // Connect to an existing queue (if found), or, create a new queue in Redis.
-const emailVerificationQueue = new Queue('email-verification', {
+const standardQueue = new Queue('standard-queue', {
   connection: {
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
@@ -37,18 +37,18 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/queues');
 app.use('/queues', serverAdapter.getRouter());
 createBullBoard({
-  queues: [new BullMQAdapter(emailVerificationQueue)],
+  queues: [new BullMQAdapter(standardQueue)],
   serverAdapter,
 });
 
 // Adding a POST endpoint to make a place a dummy job into the Bull queue.
 // The job has exponential backoff should it fail, and can be retried twenty times.
-app.post('/job', async (_request, response) => {
+app.post('/standard-queue/job', async (_request, response) => {
   const firstName = faker.name.firstName();
   const lastName = faker.name.lastName();
   const email = faker.internet.email(firstName, lastName);
 
-  const job = await emailVerificationQueue.add(
+  const job = await standardQueue.add(
     'example job name',
     { firstName, lastName, email },
     {
@@ -64,8 +64,8 @@ app.post('/job', async (_request, response) => {
 });
 
 // Adding a GET endpoint to look up information on a particular job by ID.
-app.get('/job/:id', async (request, response) => {
-  const job = await emailVerificationQueue.getJob(request.params.id);
+app.get('/standard-queue/job/:id', async (request, response) => {
+  const job = await standardQueue.getJob(request.params.id);
 
   if (job === null) {
     response.status(404).end();

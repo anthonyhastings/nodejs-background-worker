@@ -17,9 +17,9 @@ const processingFunc = async (job) => {
   logger.info(`Processing Job ID #${job.id}`, { data: job.data });
   await job.log('Beginning processing...');
 
-  // Making jobs fail 50% of the time. Failure is denoted by throwing an error
+  // Making jobs fail 40% of the time. Failure is denoted by throwing an error
   // which rejects the processing functions promise.
-  if (Math.random() < 0.5) {
+  if (Math.random() < 0.4) {
     logger.error(`Failed to process Job ID #${job.id}`);
     throw new Error(`Job ${job.id} failed!`);
   }
@@ -43,18 +43,14 @@ const processingFunc = async (job) => {
 };
 
 // Instantiate the worker, connect to redis and attach to the queue name.
-const emailVerificationWorker = new Worker(
-  'email-verification',
-  processingFunc,
-  {
-    connection: {
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
-    },
-  }
-);
+const standardQueueWorker = new Worker('standard-queue', processingFunc, {
+  connection: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
+});
 
 // Logging to the console every time a job is completed successfully.
-emailVerificationWorker.on('completed', (job, returnValue) => {
+standardQueueWorker.on('completed', (job, returnValue) => {
   logger.info(`Job with id ${job.id} has been completed.`, returnValue);
 });
