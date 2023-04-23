@@ -1,5 +1,5 @@
 version: '3.8'
-x-service-defaults: &service-defaults
+x-container-common: &container-common
   build:
     context: ./
   depends_on:
@@ -7,18 +7,23 @@ x-service-defaults: &service-defaults
   environment:
     - REDIS_HOST=redis
     - REDIS_PORT=6379
+    - SERVICE_HOST=service
+    - SERVICE_PORT=5000
   volumes:
     - ./src:/home/node/src
 services:
   service:
-    <<: *service-defaults
+    <<: *container-common
     command: sh -c "dockerize -wait tcp://redis:6379 yarn start:service"
     ports:
       - target: 5000
         published: 8080
   standard-queue-worker:
-    <<: *service-defaults
+    <<: *container-common
     command: sh -c "dockerize -wait tcp://redis:6379 yarn start:standard-queue-worker"
+  rate-limited-queue-worker:
+    <<: *container-common
+    command: sh -c "dockerize -wait tcp://redis:6379 yarn start:rate-limited-queue-worker"
   redis:
     image: redis:7.0.5-alpine
     command: redis-server --appendonly yes

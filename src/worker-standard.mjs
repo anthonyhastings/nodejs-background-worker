@@ -2,14 +2,9 @@
 import * as dotenv from 'dotenv';
 import { Worker } from 'bullmq';
 import { logger } from './logger.mjs';
+import { sleep } from './sleep.mjs';
 
 dotenv.config();
-
-// An artificial sleep method to simulate a wait.
-const sleep = (ms) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 
 // Defines a processing function for jobs in the queue.
 // The function is async so it returns a promise.
