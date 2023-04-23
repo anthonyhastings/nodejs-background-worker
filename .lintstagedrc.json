@@ -1,0 +1,4 @@
+{
+  "*.{js,jsx,ts,tsx,mjs,mts}": ["prettier --write", "yarn run eslint:base"],
+  "*.{json,md}": ["prettier --write"]
+}

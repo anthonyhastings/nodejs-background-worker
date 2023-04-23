@@ -1,31 +1,20 @@
 /* eslint-disable no-await-in-loop */
 import * as dotenv from 'dotenv';
-import Queue from 'bull';
-import logger from './logger.mjs';
+import { Worker } from 'bullmq';
+import { logger } from './logger.mjs';
+import { sleep } from './sleep.mjs';
 
 dotenv.config();
 
-// An artificial sleep method to simulate a wait.
-const sleep = (ms) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-// Connect to an existing queue (if found), or, create a new queue in Redis.
-const emailVerificationQueue = new Queue(
-  'email-verification',
-  process.env.REDIS_URL
-);
-
-// Defines a processing function for jobs in the queue. The function is async
-// so it returns a promise.
-emailVerificationQueue.process(async (job) => {
+// Defines a processing function for jobs in the queue.
+// The function is async so it returns a promise.
+const processingFunc = async (job) => {
   logger.info(`Processing Job ID #${job.id}`, { data: job.data });
   await job.log('Beginning processing...');
 
-  // Making jobs fail 50% of the time. Failure is denoted by throwing an error
+  // Making jobs fail 40% of the time. Failure is denoted by throwing an error
   // which rejects the processing functions promise.
-  if (Math.random() < 0.5) {
+  if (Math.random() < 0.4) {
     logger.error(`Failed to process Job ID #${job.id}`);
     throw new Error(`Job ${job.id} failed!`);
   }
@@ -37,7 +26,7 @@ emailVerificationQueue.process(async (job) => {
     await sleep(80);
     progress += 1;
     await job.log('Making progress...');
-    await job.progress(progress);
+    await job.updateProgress(progress);
   }
 
   // Success is denoted by resolving the processing functions promise. Data returned
@@ -46,9 +35,17 @@ emailVerificationQueue.process(async (job) => {
   await job.log('Success!');
   logger.info(`Successfully processed Job ID #${job.id}`);
   return { emailSent: true, sentAt: new Date().getTime() };
+};
+
+// Instantiate the worker, connect to redis and attach to the queue name.
+const standardQueueWorker = new Worker('standard-queue', processingFunc, {
+  connection: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
 });
 
 // Logging to the console every time a job is completed successfully.
-emailVerificationQueue.on('completed', (job) => {
-  logger.info(`Job with id ${job.id} has been completed.`, job.returnvalue);
+standardQueueWorker.on('completed', (job, returnValue) => {
+  logger.info(`Job with id ${job.id} has been completed.`, returnValue);
 });

@@ -1,41 +1,38 @@
 {
   "name": "nodejs-background-worker",
-  "description": "NodeJS service that offloads expensive jobs to Bull for background processing.",
+  "description": "NodeJS service that offloads expensive jobs to a BullMQ message queue for background processing.",
   "author": "Anthony Hastings <ar.hastings@gmail.com> (https://anthonyhastings.github.io/)",
   "main": "src/service.mjs",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@bull-board/api": "^4.6.3",
-    "@bull-board/express": "^4.6.3",
+    "@bull-board/api": "^5.0.0",
+    "@bull-board/express": "^5.0.0",
     "@faker-js/faker": "^7.6.0",
-    "bull": "^4.10.1",
+    "bullmq": "^3.10.4",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-winston": "^4.2.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "^8.27.0",
+    "eslint": "^8.38.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.26.0",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1"
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.1",
+    "prettier": "^2.8.7"
   },
   "scripts": {
+    "check:format": "prettier --check .",
     "eslint:base": "eslint --ext .mjs --max-warnings 0",
-    "eslint:check": "eslint-config-prettier src/service.mjs",
-    "lint:format": "prettier --check .",
-    "lint:scripts": "time yarn run eslint:base src/",
+    "lint": "time yarn run eslint:base src/",
     "prepare": "husky install",
     "start:service": "node --watch src/service.mjs",
-    "start:worker": "node --watch src/worker.mjs"
-  },
-  "lint-staged": {
-    "*.{mjs}": "yarn run eslint:base"
+    "start:standard-queue-worker": "node --watch src/worker-standard.mjs",
+    "start:rate-limited-queue-worker": "node --watch src/worker-rate-limited.mjs"
   }
 }
